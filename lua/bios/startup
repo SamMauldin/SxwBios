@@ -1,0 +1,46 @@
+local function normboot()
+if not fs.exists("/.sysfiles/setupdone") then
+fs.makeDir("/.sysfiles")
+os.run({},"/rom/bios/setup")
+os.reboot()
+end
+os.run({}, "/rom/bios/finishboot")
+end
+
+os.loadAPI("/rom/bios/coreutils")
+os.loadAPI("/rom/bios/bioslogo")
+
+coreutils.invert(true)
+
+coreutils.clear()
+
+print("Welcome to SxwTech bios!")
+print("Press any key or click to access the admin control panel...")
+bioslogo.draw()
+
+local oldpull=os.pullEvent
+os.pullEvent=os.pullEventRaw
+os.startTimer(1.5)
+e,p=os.pullEvent()
+if e=="timer" then
+os.pullEvent=oldpull
+--Continue
+get_pass()
+print("Continuing boot...")
+normboot()
+else
+local oldpull=os.pullEvent
+os.pullEvent=os.pullEventRaw
+print("SxwBios Control")
+write("Please authenticate:")
+local pass=read("*")
+if pass==get_pass() then
+os.pullEvent=oldpull
+os.run({},"/rom/bios/bypassmode")
+os.shutdown()
+else
+print("Authentication denied.")
+sleep(1)
+os.reboot()
+end
+end

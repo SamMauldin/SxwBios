@@ -1,0 +1,67 @@
+os.loadAPI("/rom/bios/menu")
+
+function opt_shell()
+coreutils.invert(false)
+coreutils.clear()
+os.run({}, "/rom/bios/shellmod")
+coreutils.invert(true)
+end
+
+function menu_pass()
+local options={"Add/Change no-disk boot", "Delete no-disk boot",
+"Add/Change disk boot", "Delete disk boot", "Back"}
+
+local x,y=term.getSize()
+local opt=menu.newMenu(options,1,1,y)
+if opt=="Add/Change no-disk boot" then
+coreutils.clear()
+print("Ok, what do you want your password to be?")
+write("Password:")
+local pass=read("*")
+print("Configuring...")
+coreutils.writeFile("/.sysfiles/bootpass", coreutils.sha256(pass))
+print("Done!")
+sleep(1)
+elseif opt=="Delete no-disk boot" then
+fs.delete("/.sysfiles/bootpass")
+coreutils.clear()
+print("Done!")
+sleep(1)
+elseif opt=="Add/Change disk boot" then
+coreutils.clear()
+print("Ok, what do you want your password to be?")
+write("Password:")
+local pass=read("*")
+print("Configuring...")
+coreutils.writeFile("/.sysfiles/diskpass", coreutils.sha256(pass))
+print("Done!")
+sleep(1)
+elseif opt=="Delete disk boot" then
+fs.delete("/.sysfiles/diskpass")
+coreutils.clear()
+print("Done!")
+sleep(1)
+end
+end
+
+function menu_main()
+local options={"Shell", "Password", "Exit"}
+
+local x,y=term.getSize()
+local opt=menu.newMenu(options,1,1,y)
+if opt=="Shell" then
+coreutils.clear()
+opt_shell()
+elseif opt=="Password" then
+coreutils.clear()
+menu_pass()
+elseif opt=="Exit" then
+os.reboot()
+end
+end
+
+sleep(1)
+while true do
+coreutils.clear()
+menu_main()
+end

@@ -1,0 +1,60 @@
+local rootfs={}
+for k,v in pairs(fs) do
+rootfs[k]=v
+end
+
+local protected_files={"/rom/bios", "/.sysfiles"}
+
+local function shorten(file)
+return rootfs.combine("", file)
+end
+
+--From lua users wiki
+local function starts(String,Start)
+   return string.sub(String,1,string.len(Start))==Start
+end
+
+local function valid(path)
+local allowed=true
+local xpath=shorten(path)
+for k,v in pairs(protected_files) do
+if starts(xpath, shorten(v)) then
+error("Cannot get information from system files.")
+end
+end
+return xpath
+end
+
+fs.list=function(path)
+return rootfs.list(valid(path))
+end
+fs.exists=function(path)
+return rootfs.exists(valid(path))
+end
+fs.isDir=function(path)
+return rootfs.isDir(valid(path))
+end
+fs.isReadOnly=function(path)
+return rootfs.isReadOnly(valid(path))
+end
+fs.getDrive=function(path)
+return rootfs.getDrive(valid(path))
+end
+fs.getSize=function(path)
+return rootfs.getSize(chrootpath..path)
+end
+fs.makeDir=function(path)
+return rootfs.makeDir(valid(path))
+end
+fs.move=function(path, cpath)
+return rootfs.move(valid(path), valid(cpath))
+end
+fs.copy=function(path, cpath)
+return rootfs.copy(valid(path), valid(cpath))
+end
+fs.delete=function(path)
+return rootfs.delete(valid(path))
+end
+fs.open=function(path, m)
+return rootfs.open(valid(path), m)
+end

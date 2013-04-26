@@ -1,0 +1,40 @@
+local diskBoot=false
+for n,sSide in pairs( redstone.getSides() ) do
+	if disk.isPresent( sSide ) and disk.hasData( sSide ) then
+		diskBoot=true
+	end
+end
+
+if diskBoot==true then
+if fs.exists("/.sysfiles/diskpass") then
+coreutils.clear()
+print("This computer is password protected for disk boots.")
+write("Password:")
+local pass=read("*")
+if coreutils.sha256(pass)==coreutils.readFile("/.sysfiles/diskpass") then
+print("Hello!")
+else
+print("Sorry, thats the wrong password.")
+sleep(5)
+os.reboot()
+end
+end
+else
+if fs.exists("/.sysfiles/bootpass") then
+coreutils.clear()
+print("This computer is password protected.")
+write("Password:")
+local pass=read("*")
+if coreutils.sha256(pass)==coreutils.readFile("/.sysfiles/bootpass") then
+print("Hello!")
+else
+print("Sorry, thats the wrong password.")
+sleep(5)
+os.reboot()
+end
+end
+end
+coreutils.invert(false)
+coreutils.clear()
+os.run({}, "/rom/bios/sandbox")
+os.run({},"/rom/programs/shell")

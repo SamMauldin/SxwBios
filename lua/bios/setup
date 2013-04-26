@@ -1,0 +1,47 @@
+os.pullEvent=os.pullEventRaw
+os.loadAPI("/rom/bios/menu")
+coreutils.clear()
+
+print("Welcome to your new computer! We will guide you through all the steps to setup your computer.")
+print("Press any key to continue.")
+
+os.pullEvent("key")
+
+
+function menu_nodisk_pass()
+coreutils.clear()
+print("Do you want a password to boot without a disk?")
+local options={"Yes", "No"}
+
+local x,y=term.getSize()
+local opt=menu.newMenu(options,1,2,y)
+if opt=="Yes" then
+coreutils.clear()
+write("Please choose your password:")
+local pass=coreutils.sha256(read("*"))
+coreutils.writeFile("/.sysfiles/bootpass", pass)
+end
+end
+
+function menu_disk_pass()
+coreutils.clear()
+print("Do you want a password to boot with a disk?")
+local options={"Yes", "No"}
+
+local x,y=term.getSize()
+local opt=menu.newMenu(options,1,2,y)
+if opt=="Yes" then
+coreutils.clear()
+write("Please choose your password:")
+local pass=coreutils.sha256(read("*"))
+coreutils.writeFile("/.sysfiles/diskpass", pass)
+end
+end
+
+menu_nodisk_pass()
+menu_disk_pass()
+coreutils.clear()
+coreutils.touchFile("/.sysfiles/setupdone")
+print("Your all setup! System will now reboot...")
+sleep(1)
+os.reboot()
